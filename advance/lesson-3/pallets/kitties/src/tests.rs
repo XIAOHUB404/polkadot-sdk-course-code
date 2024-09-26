@@ -1,11 +1,8 @@
 use super::*;
 use crate::mock::new_test_ext;
-use crate::{mock::*, Error, Event};
-use frame_support::{assert_noop, assert_ok};
-use frame_support::{
-    pallet_prelude::*,
-    traits::{Currency, ExistenceRequirement, ReservableCurrency},
-};
+use crate::mock::*;
+use frame_support::assert_ok;
+use frame_support::traits::Currency;
 #[test]
 fn it_works_for_default_value() {
     new_test_ext().execute_with(|| {
