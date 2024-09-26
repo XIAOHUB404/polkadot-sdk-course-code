@@ -10,6 +10,7 @@ mod tests;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
+
 pub mod weights;
 pub use weights::*;
 
@@ -37,7 +38,7 @@ pub mod pallet {
     use frame_support::{pallet_prelude::*, Blake2_128Concat};
     use frame_system::pallet_prelude::*;
     use serde::{Deserialize, Serialize};
-    use sp_runtime::traits::Bounded;
+    // use sp_runtime::traits::Bounded;
     use sp_std::prelude::*;
     use sp_weights::WeightMeter;
 
