@@ -5,6 +5,8 @@ use frame_support::pallet_macros::pallet_section;
 mod dispatches {
     #[pallet::call]
     impl<T: Config> Pallet<T> {
+        #[pallet::call_index(0)]
+        #[pallet::weight(0)]
         pub fn create(origin: OriginFor<T>) -> DispatchResult {
             let who = ensure_signed(origin)?;
             let value = Self::random_value(&who);
@@ -25,7 +27,8 @@ mod dispatches {
 
             Ok(())
         }
-
+        #[pallet::call_index(1)]
+        #[pallet::weight(0)]
         pub fn breed(origin: OriginFor<T>, kitty_1: u64, kitty_2: u64) -> DispatchResult {
             let who = ensure_signed(origin)?;
             ensure!(kitty_1 != kitty_2, Error::<T>::SameKittyId);
@@ -63,7 +66,8 @@ mod dispatches {
             });
             Ok(())
         }
-
+        #[pallet::call_index(2)]
+        #[pallet::weight(0)]
         pub fn transfer(origin: OriginFor<T>, kitty_id: u64, to: T::AccountId) -> DispatchResult {
             let who = ensure_signed(origin)?;
 
@@ -84,7 +88,8 @@ mod dispatches {
             });
             Ok(())
         }
-
+        #[pallet::call_index(3)]
+        #[pallet::weight(0)]
         pub fn sale(
             origin: OriginFor<T>,
             kitty_id: u64,
@@ -114,6 +119,8 @@ mod dispatches {
             Ok(())
         }
 
+        #[pallet::call_index(4)]
+        #[pallet::weight(0)]
         pub fn bid(origin: OriginFor<T>, kitty_id: u64, price: BalanceOf<T>) -> DispatchResult {
             let bidder = ensure_signed(origin)?;
 
@@ -153,7 +160,7 @@ mod dispatches {
             // ensure!(bids.len() < bids.capacity(), Error::<T>::BidsLimitMax);
             let new_bid = (bidder.clone(), price);
 
-            bids.push(new_bid.clone());
+            // bids.push(new_bid.clone());
 
             KittiesBid::<T>::insert(kitty_id, bids);
             KittyWinner::<T>::insert(kitty_id, new_bid.clone());
