@@ -3,6 +3,8 @@ use frame_support::pallet_macros::pallet_section;
 /// Define all extrinsics for the pallet.
 #[pallet_section]
 mod dispatches {
+    // use frame_support::storage::bounded_vec;
+
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         #[pallet::call_index(0)]
@@ -155,14 +157,28 @@ mod dispatches {
             );
 
             //handle bid
-            let mut bids = KittiesBid::<T>::get(kitty_id).unwrap_or_default();
-            // 检查容量
-            // ensure!(bids.len() < bids.capacity(), Error::<T>::BidsLimitMax);
-            let new_bid = (bidder.clone(), price);
-            //TODO: BoundedVec push(new_bid)
-            // bids.push(new_bid.clone());
+            let mut bids = KittiesBid::<T>::get(kitty_id);
 
-            KittiesBid::<T>::insert(kitty_id, bids);
+            let new_bid = (bidder.clone(), price);
+            // bids.push(new_bid.clone());
+            // KittiesBid::<T>::insert(kitty_id, bids);
+
+            match bids {
+                Some(mut bounded_vec) => {
+                    if let Err(_) = bounded_vec.try_push(new_bid.clone()) {
+                        //TODO: ("Failed to add new bid: BoundedVec is full");
+                        let bo = true;
+                        ensure!(!bo, Error::<T>::BidsLimitMax);
+                    } else {
+                        KittiesBid::<T>::insert(kitty_id, bounded_vec);
+                    }
+                }
+                None => {
+                    let bounded_vec = BoundedVec::try_from(vec![new_bid.clone()]).unwrap();
+                    KittiesBid::<T>::insert(kitty_id, bounded_vec);
+                }
+            }
+
             KittyWinner::<T>::insert(kitty_id, new_bid.clone());
 
             Self::deposit_event(Event::KittyBid {

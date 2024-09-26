@@ -65,7 +65,7 @@ pub mod pallet {
         _,
         Blake2_128Concat,
         u64,
-        BoundedVec<(T::AccountId, BalanceOf<T>), ConstU32<100>>,
+        BoundedVec<(T::AccountId, BalanceOf<T>), ConstU32<500>>,
     >;
     #[pallet::storage]
     pub type KittyWinner<T: Config> =

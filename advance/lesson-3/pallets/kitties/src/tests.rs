@@ -3,6 +3,7 @@ use crate::mock::new_test_ext;
 use crate::mock::*;
 use frame_support::assert_ok;
 use frame_support::traits::Currency;
+use frame_support::BoundedVec;
 #[test]
 fn it_works_for_default_value() {
     new_test_ext().execute_with(|| {
@@ -89,5 +90,9 @@ fn bid_works() {
         assert_ok!(PalletKitties::bid(bidder, 0, 1001));
         let balance2 = <Test as Config>::Currency::reserved_balance(bidder_id);
         assert_eq!(balance2, 1001);
+
+        let expected_bid = Some(BoundedVec::try_from(vec![(1, 1001)]).unwrap());
+
+        assert_eq!(crate::KittiesBid::<Test>::get(0), expected_bid);
     });
 }
