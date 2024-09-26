@@ -21,7 +21,7 @@ mod genesis {
     #[pallet::genesis_build]
     impl<T: Config> BuildGenesisConfig for GenesisConfig<T> {
         fn build(&self) {
-            Kitties::<T>::insert(u32::MAX, self.genesis_kitty.clone());
+            Kitties::<T>::insert(u64::MAX, self.genesis_kitty.clone());
         }
     }
 }

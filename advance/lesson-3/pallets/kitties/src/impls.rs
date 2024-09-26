@@ -14,7 +14,12 @@ mod impls {
                 .ok()
                 .expect("nonce is u32; qed");
             // payload.using_encoded(blake2_128)
-            [0_u8; 16]
+            let (random_seed, _) = T::Randomness::random(&who.encode());
+
+            let value = (random_seed, nonce_u32, a);
+            let random_res = sp_io::hashing::blake2_128(&value.encode());
+
+            random_res
         }
 
         // breed on kitty based on both paraent kitties

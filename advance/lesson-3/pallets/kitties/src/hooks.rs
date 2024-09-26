@@ -11,6 +11,45 @@ mod hooks {
 
         fn on_initialize(n: BlockNumberFor<T>) -> Weight {
             log::info!("Kitties on_initialize at block {:?}", n);
+
+            for (kitty_id, (owner, until_block, _)) in KittySale::<T>::iter() {
+                if until_block == n {
+                    // handle_sale_expiration
+                    let bids = KittiesBid::<T>::get(kitty_id).unwrap_or_default();
+                    if !bids.is_empty() {
+                        let bid_win = KittyWinner::<T>::get(kitty_id);
+                        if let Some((win_bidder, last_bid_price)) = bid_win {
+                            for (bidder, bid_price) in bids {
+                                if &bidder != &win_bidder {
+                                    //refund_unsuccessful_bidders
+                                    T::Currency::unreserve(&bidder, bid_price);
+                                } else if &bidder == &win_bidder {
+                                    //repatriate_reserved_winner
+                                    if T::Currency::repatriate_reserved(
+                                        &win_bidder,
+                                        &owner,
+                                        last_bid_price,
+                                        BalanceStatus::Free,
+                                    )
+                                    .is_ok()
+                                    {
+                                        // 将 Kitty 转移给最高出价者
+                                        KittyOwner::<T>::insert(kitty_id, win_bidder.clone());
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 清除 上架状态
+                    KittySale::<T>::remove(kitty_id);
+                    // 保留 对应的出价记录
+                    // KittiesBid::<T>::remove(kitty_id);
+
+                    Self::deposit_event(Event::KittySaleEnded { kitty_id, owner });
+                }
+            }
+
             Weight::default()
         }
 
