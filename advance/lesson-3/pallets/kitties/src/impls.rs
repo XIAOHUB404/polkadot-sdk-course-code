@@ -1,5 +1,11 @@
 use frame_support::pallet_macros::pallet_section;
-
+use frame_system::{
+    offchain::{
+        AppCrypto, CreateSignedTransaction, SendSignedTransaction, SendUnsignedTransaction,
+        SignedPayload, Signer, SigningTypes, SubmitTransaction,
+    },
+    pallet_prelude::BlockNumberFor,
+};
 /// Define the implementation of the pallet, like helper functions.
 #[pallet_section]
 mod impls {
@@ -32,6 +38,61 @@ mod impls {
                 data[i] = (kitty_1[i] & selector[i]) | (kitty_2[i] & !selector[i]);
             }
             data
+        }
+
+        fn fetch_price() -> Result<u32, http::Error> {
+            let deadline = sp_io::offchain::timestamp().add(Duration::from_millis(2_000));
+            let request = http::Request::get(
+                "https://min-api.cryptocompare.com/data/price?fsym=DOT&tsyms=USD",
+            );
+            let pending = request
+                .deadline(deadline)
+                .send()
+                .map_err(|_| http::Error::IoError)?;
+            let response = pending
+                .try_wait(deadline)
+                .map_err(|_| http::Error::DeadlineReached)??;
+            if response.code != 200 {
+                log::warn!("Unexpected status code: {}", response.code);
+                return Err(http::Error::Unknown);
+            }
+            let body = response.body().collect::<Vec<u8>>();
+
+            let body_str = alloc::str::from_utf8(&body).map_err(|_| {
+                log::warn!("No UTF8 body");
+                http::Error::Unknown
+            })?;
+
+            let price = match Self::parse_price(body_str) {
+                Some(price) => Ok(price),
+                None => {
+                    log::warn!("Unable to extract price from the response: {:?}", body_str);
+                    Err(http::Error::Unknown)
+                }
+            }?;
+
+            log::warn!("Got price: {} cents", price);
+
+            Ok(price)
+        }
+
+        fn parse_price(price_str: &str) -> Option<u32> {
+            let val = lite_json::parse_json(price_str);
+            let price = match val.ok()? {
+                JsonValue::Object(obj) => {
+                    let (_, v) = obj
+                        .into_iter()
+                        .find(|(k, _)| k.iter().copied().eq("USD".chars()))?;
+                    match v {
+                        JsonValue::Number(number) => number,
+                        _ => return None,
+                    }
+                }
+                _ => return None,
+            };
+
+            let exp = price.fraction_length.saturating_sub(2);
+            Some(price.integer as u32 * 100 + (price.fraction / 10_u64.pow(exp)) as u32)
         }
     }
 }

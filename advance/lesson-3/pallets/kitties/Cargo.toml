@@ -19,6 +19,10 @@ targets = ["x86_64-unknown-linux-gnu"]
 codec = { package = "parity-scale-codec", version = "3.6.1", default-features = false, features = [
 	"derive",
 ] }
+lite-json = { version = "0.2.0", default-features = false, defaults = [
+	"no_std",
+] }
+
 scale-info = { version = "2.10.0", default-features = false, features = [
 	"derive",
 ] }
@@ -43,6 +47,7 @@ sp-io = { git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkado
 
 sp-tracing = { git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkadot-v1.10.0" }
 env_logger = "0.11.5"
+
 
 [features]
 default = ["std"]

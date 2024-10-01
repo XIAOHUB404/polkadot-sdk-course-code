@@ -203,5 +203,16 @@ mod dispatches {
 
             Ok(())
         }
+
+        #[pallet::call_index(5)]
+        #[pallet::weight(0)]
+        pub fn set_latest_price_unsigned(origin: OriginFor<T>, price: u32) -> DispatchResult {
+            log::info!("set_latest_price_unsigned {}", price);
+            ensure_none(origin)?;
+            // Store the price
+            LatestPrice::<T>::put(price);
+            Self::deposit_event(Event::KittyPrice { price });
+            Ok(())
+        }
     }
 }

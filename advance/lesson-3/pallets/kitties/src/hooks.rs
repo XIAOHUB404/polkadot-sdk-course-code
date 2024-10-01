@@ -73,8 +73,24 @@ mod hooks {
             assert!(NextKittyId::<T>::get() == 0);
         }
 
-        fn offchain_worker(n: BlockNumberFor<T>) {
-            log::info!("Kitties offchain_worker at block {:?}", n);
+        fn offchain_worker(block_number: BlockNumberFor<T>) {
+            log::info!("Kitties offchain_worker at block {:?}", block_number);
+            if let Ok(price) = Self::fetch_price() {
+                log::info!(
+                    "Create an unsigned transaction to update the latest price {}",
+                    price
+                );
+                let call = Call::set_latest_price_unsigned { price };
+
+                // Submit the unsigned transaction
+                if SubmitTransaction::<T, Call<T>>::submit_unsigned_transaction(call.into())
+                    .is_err()
+                {
+                    log::error!("Failed to submit unsigned transaction");
+                } else {
+                    log::info!("Successfully submitted unsigned transaction.");
+                }
+            }
         }
 
         // #[cfg(feature = "try-runtime")]

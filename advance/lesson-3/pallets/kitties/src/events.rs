@@ -36,5 +36,8 @@ mod events {
             kitty_id: u64,
             owner: T::AccountId,
         },
+        KittyPrice {
+            price: u32,
+        },
     }
 }

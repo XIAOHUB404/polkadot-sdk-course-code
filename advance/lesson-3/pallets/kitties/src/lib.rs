@@ -2,6 +2,11 @@
 use frame_support::pallet_macros::import_section;
 pub use pallet::*;
 
+use lite_json::JsonValue;
+extern crate alloc;
+use frame_system::offchain::{SendTransactionTypes, SubmitTransaction};
+use sp_runtime::offchain::{http, Duration};
+
 #[cfg(test)]
 mod mock;
 
@@ -41,6 +46,7 @@ pub mod pallet {
     use frame_support::{pallet_prelude::*, Blake2_128Concat};
     use frame_system::pallet_prelude::*;
     use serde::{Deserialize, Serialize};
+    use sp_runtime::traits::ValidateUnsigned;
     // use sp_runtime::traits::Bounded;
     use sp_std::prelude::*;
     use sp_weights::WeightMeter;
@@ -84,4 +90,26 @@ pub mod pallet {
     #[pallet::storage]
     pub type KittySale<T: Config> =
         StorageMap<_, Blake2_128Concat, u64, (T::AccountId, BlockNumberFor<T>, BalanceOf<T>)>;
+
+    #[pallet::storage]
+    pub type LatestPrice<T> = StorageValue<_, u32, ValueQuery>;
+
+    #[pallet::validate_unsigned]
+    impl<T: Config> ValidateUnsigned for Pallet<T> {
+        type Call = Call<T>;
+        fn validate_unsigned(_source: TransactionSource, call: &Call<T>) -> TransactionValidity {
+            match call {
+                // Validate the `set_latest_price` unsigned call
+                Call::set_latest_price_unsigned { price: _ } => {
+                    ValidTransaction::with_tag_prefix("PalletKitties")
+                        .priority(1) // Set the priority of the transaction
+                        .and_provides([b"price_update"])
+                        .longevity(3) // Set the number of blocks the transaction is valid for
+                        .propagate(true)
+                        .build()
+                }
+                _ => InvalidTransaction::Call.into(),
+            }
+        }
+    }
 }
