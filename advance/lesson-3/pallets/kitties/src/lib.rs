@@ -21,6 +21,7 @@ mod extrinsics;
 mod genesis;
 mod hooks;
 mod impls;
+mod migration;
 
 /// Import all sections from different files.
 #[import_section(extrinsics::dispatches)]
@@ -34,7 +35,9 @@ mod impls;
 #[frame_support::pallet]
 pub mod pallet {
     use super::*;
-    use frame_support::traits::{BalanceStatus, Currency, Randomness, ReservableCurrency};
+    use frame_support::traits::{
+        BalanceStatus, Currency, Randomness, ReservableCurrency, StorageVersion,
+    };
     use frame_support::{pallet_prelude::*, Blake2_128Concat};
     use frame_system::pallet_prelude::*;
     use serde::{Deserialize, Serialize};
@@ -42,8 +45,15 @@ pub mod pallet {
     use sp_std::prelude::*;
     use sp_weights::WeightMeter;
 
+    #[allow(dead_code)]
+    pub(crate) const STORAGE_VERSION: StorageVersion = StorageVersion::new(0);
+
     #[derive(Encode, Decode, Clone, Default, TypeInfo, Serialize, Deserialize, MaxEncodedLen)]
-    pub struct Kitty(pub [u8; 16]);
+    // pub struct Kitty(pub [u8; 16]);
+    pub struct Kitty {
+        pub dna: [u8; 16],
+        pub price: u32,
+    }
     pub type BalanceOf<T> =
         <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 

@@ -15,8 +15,14 @@ mod dispatches {
 
             //create new kitty
             let kitty_id = NextKittyId::<T>::get();
-            Kitties::<T>::insert(kitty_id, Kitty(value));
-
+            // Kitties::<T>::insert(kitty_id, Kitty(value));
+            Kitties::<T>::insert(
+                kitty_id,
+                Kitty {
+                    dna: value,
+                    price: 0,
+                },
+            );
             let next_id = kitty_id.checked_add(1).ok_or(Error::<T>::KittyIdOverflow)?;
             NextKittyId::<T>::put(next_id);
 
@@ -52,11 +58,18 @@ mod dispatches {
             let kitty_2_owner = KittyOwner::<T>::get(kitty_2).ok_or(Error::<T>::InvalidKittyId)?;
             ensure!(who == kitty_1_owner, Error::<T>::NotOwner);
             ensure!(who == kitty_2_owner, Error::<T>::NotOwner);
-            let data = Self::breed_kitty(&who, k1value.0, k2value.0);
+            let data = Self::breed_kitty(&who, k1value.dna, k2value.dna);
 
             //create new kitty
             let kitty_id = NextKittyId::<T>::get();
-            Kitties::<T>::insert(kitty_id, Kitty(data));
+            // Kitties::<T>::insert(kitty_id, Kitty(data));
+            Kitties::<T>::insert(
+                kitty_id,
+                Kitty {
+                    dna: data,
+                    price: 0,
+                },
+            );
             let next_id = kitty_id.checked_add(1).ok_or(Error::<T>::KittyIdOverflow)?;
             NextKittyId::<T>::put(next_id);
             KittyOwner::<T>::insert(kitty_id, who.clone());

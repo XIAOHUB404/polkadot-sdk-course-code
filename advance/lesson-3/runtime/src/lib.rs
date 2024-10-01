@@ -363,7 +363,8 @@ impl<T: pallet_kitties::Config> frame_support::traits::OnRuntimeUpgrade for Kitt
 ///
 /// This can be a tuple of types, each implementing `OnRuntimeUpgrade`.
 #[allow(unused_parens)]
-type Migrations = (KittiesMigration<Runtime>);
+type Migrations = ();
+// type Migrations = (KittiesMigration<Runtime>);// test second upgrade
 
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic =

@@ -1,12 +1,11 @@
 use frame_support::pallet_macros::pallet_section;
-
 /// Define all hooks used in the pallet.
 #[pallet_section]
 mod hooks {
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
         fn on_runtime_upgrade() -> Weight {
-            Weight::default()
+            migration::migration_to_v1::<T>()
         }
 
         fn on_initialize(n: BlockNumberFor<T>) -> Weight {
