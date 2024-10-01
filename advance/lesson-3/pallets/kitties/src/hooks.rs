@@ -5,7 +5,9 @@ mod hooks {
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
         fn on_runtime_upgrade() -> Weight {
-            migration::migration_to_v1::<T>()
+            let weight = migration::migration_to_v1::<T>();
+            log::info!("migration_to_v1 weight : {}", weight);
+            weight
         }
 
         fn on_initialize(n: BlockNumberFor<T>) -> Weight {

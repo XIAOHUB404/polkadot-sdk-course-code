@@ -85,4 +85,19 @@ mod benches {
         #[extrinsic_call]
         Pallet::<T>::bid(RawOrigin::Signed(bidder), kitty_id, 11u32.into());
     }
+
+    // use migration::v0;
+    // #[benchmark]
+    // fn migration_to_v1() {
+    //     let caller: T::AccountId = whitelisted_caller();
+    //     for i in 0..1000 {
+    //         let dna = [i as u8; 16];
+    //         let old_kitty = v0::OldKitty(dna);
+    //         v0::Kitties::<T, v0::OldKitty>::insert(i as u64, old_kitty);
+    //     }
+    //     StorageVersion::new(0).put::<Pallet<T>>();
+
+    //     // #[extrinsic_call]
+    //     migration::migration_to_v1::<T>(RawOrigin::Signed(caller));
+    // }
 }
