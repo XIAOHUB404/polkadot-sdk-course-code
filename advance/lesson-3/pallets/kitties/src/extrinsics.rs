@@ -157,6 +157,7 @@ mod dispatches {
             );
 
             //handle bid
+            #[allow(unused_mut)]
             let mut bids = KittiesBid::<T>::get(kitty_id);
 
             let new_bid = (bidder.clone(), price);

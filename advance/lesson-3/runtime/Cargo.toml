@@ -77,7 +77,7 @@ pallet-insecure-randomness-collective-flip = { git = "https://github.com/parityt
 # The pallet in this template.
 pallet-template = { path = "../pallets/template", default-features = false }
 pallet-kitties = { path = "../pallets/kitties", default-features = false }
-
+log = { version = "0.4.21", default-features = false }
 [build-dependencies]
 substrate-wasm-builder = { git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkadot-v1.10.0", optional = true }
 
@@ -151,4 +151,7 @@ try-runtime = [
 	"pallet-timestamp/try-runtime",
 	"pallet-transaction-payment/try-runtime",
 	"sp-runtime/try-runtime",
+	"pallet-kitties/try-runtime",
+	"pallet-insecure-randomness-collective-flip/try-runtime",
+
 ]
