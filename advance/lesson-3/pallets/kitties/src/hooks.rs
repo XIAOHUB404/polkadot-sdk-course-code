@@ -1,4 +1,5 @@
 use frame_support::pallet_macros::pallet_section;
+
 /// Define all hooks used in the pallet.
 #[pallet_section]
 mod hooks {
@@ -36,6 +37,28 @@ mod hooks {
                                     {
                                         // 将 Kitty 转移给最高出价者
                                         KittyOwner::<T>::insert(kitty_id, win_bidder.clone());
+
+                                        //更新USD价格
+                                        let p = LatestPrice::<T>::get() as u32;
+                                        let usd_price_balance =
+                                            BalanceOf::<T>::from(p) * last_bid_price;
+
+                                        match Self::balance_to_u32(usd_price_balance) {
+                                            Ok(usd_price) => {
+                                                if let Some(k1) = Kitties::<T>::get(kitty_id) {
+                                                    Kitties::<T>::insert(
+                                                        kitty_id,
+                                                        Kitty {
+                                                            dna: k1.dna,
+                                                            price: usd_price,
+                                                        },
+                                                    );
+                                                };
+                                            }
+                                            Err(err) => {
+                                                log::info!("Error converting balance: {}", err);
+                                            }
+                                        }
                                     }
                                 }
                             }

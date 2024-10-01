@@ -94,5 +94,11 @@ mod impls {
             let exp = price.fraction_length.saturating_sub(2);
             Some(price.integer as u32 * 100 + (price.fraction / 10_u64.pow(exp)) as u32)
         }
+
+        fn balance_to_u32(balance: BalanceOf<T>) -> Result<u32, &'static str> {
+            // Attempt to convert to u32
+            let balance_as_u32: u32 = balance.try_into().map_err(|_| "Conversion failed")?;
+            Ok(balance_as_u32)
+        }
     }
 }
